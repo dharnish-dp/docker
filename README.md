@@ -15,7 +15,7 @@ Each lesson includes concepts, analogies, commands, and exercises.
 | [Lesson 04](lessons/04-your-first-dockerfile.md) | Your First Dockerfile | ✅ Done |
 | [Lesson 05](lessons/05-layer-caching-and-optimization.md) | Layer Caching & Build Optimization | ✅ Done |
 | [Lesson 06](lessons/06-networking-deep-dive.md) | Networking Deep Dive | ✅ Done |
-| Lesson 07 | Storage: Volumes & Bind Mounts | ⏳ Upcoming |
+| [Lesson 07](lessons/07-storage-volumes-and-bind-mounts.md) | Storage: Volumes & Bind Mounts | ✅ Done |
 | Lesson 08 | Docker Compose | ⏳ Upcoming |
 | Lesson 09 | Security | ⏳ Upcoming |
 | Lesson 10 | Production Patterns | ⏳ Upcoming |
