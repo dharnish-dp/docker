@@ -13,17 +13,121 @@ step by step. Each instruction creates one layer in the final image.
 
 ---
 
-## Dockerfile Instructions
+## All Dockerfile Instructions Explained
 
 ```dockerfile
-FROM   <base image>      # start from an existing image
-WORKDIR <path>           # set working directory inside the image
-COPY   <src> <dest>      # copy files from your machine into the image
-RUN    <command>         # execute a shell command during build
-ENV    KEY=VALUE         # set environment variables
-EXPOSE <port>            # document which port the app listens on
-CMD    ["executable"]    # default command when container starts
+FROM   <image>:<tag>     # start from an existing image — always first line
+ARG    NAME=value        # build-time variable (not available at runtime)
+ENV    KEY=VALUE         # environment variable (available at build AND runtime)
+WORKDIR <path>           # set working directory (creates it if not exists)
+COPY   <src> <dest>      # copy files from your Mac into the image
+ADD    <src> <dest>      # like COPY but also extracts .tar files and supports URLs
+RUN    <command>         # execute command during build — creates a layer
+EXPOSE <port>            # documentation only — does NOT open a port
+USER   <user>            # set which user runs subsequent commands
+LABEL  key=value         # add metadata to the image
+ENTRYPOINT ["cmd"]       # the fixed executable — cannot be overridden by docker run
+CMD    ["args"]          # default arguments — can be overridden by docker run
 ```
+
+---
+
+## Key Instruction Details
+
+### `FROM`
+Always the first instruction. Defines the base image.
+```dockerfile
+FROM python:3.11-slim          # specific tag — always pin this
+FROM python:3.11-slim AS build # named stage — used in multi-stage builds (Lesson 11)
+```
+
+### `ARG` vs `ENV`
+```dockerfile
+ARG  VERSION=1.0       # build-time only — not visible inside running container
+ENV  APP_ENV=prod      # available during build AND inside container at runtime
+```
+Use `ARG` for build configuration (e.g., version numbers).
+Use `ENV` for runtime configuration (e.g., app settings, paths).
+
+### `COPY` vs `ADD`
+```dockerfile
+COPY app.py /app/          # simple copy — always prefer this
+ADD  archive.tar.gz /app/  # COPY + auto-extract tar files
+ADD  https://... /app/     # COPY + download from URL (avoid — unpredictable)
+```
+**Rule:** Always use `COPY` unless you specifically need tar extraction.
+`ADD` has hidden behaviour that makes Dockerfiles harder to understand.
+
+### `ENTRYPOINT` vs `CMD`
+
+This is one of the most confused topics in Docker.
+
+```
+ENTRYPOINT = the executable that always runs — cannot be overridden
+CMD        = default arguments to ENTRYPOINT — can be overridden
+```
+
+```dockerfile
+# Only CMD — the whole thing can be overridden
+CMD ["python", "app.py"]
+docker run myimage              # runs: python app.py
+docker run myimage python other.py  # runs: python other.py (overridden)
+
+# Only ENTRYPOINT — arguments can be passed but executable is fixed
+ENTRYPOINT ["python"]
+docker run myimage              # runs: python  (no args)
+docker run myimage app.py       # runs: python app.py
+
+# Both together — best pattern for production
+ENTRYPOINT ["python"]
+CMD ["app.py"]
+docker run myimage              # runs: python app.py  (default)
+docker run myimage other.py     # runs: python other.py  (CMD overridden)
+```
+
+**Rule:** Use `ENTRYPOINT` for the executable, `CMD` for default arguments.
+For simple scripts, `CMD` alone is fine.
+
+### Shell form vs Exec form
+
+Every `RUN`, `CMD`, and `ENTRYPOINT` can be written two ways:
+
+```dockerfile
+# Shell form — string, runs via /bin/sh -c
+CMD python app.py
+RUN pip install requests
+
+# Exec form — JSON array, runs directly (no shell)
+CMD ["python", "app.py"]
+RUN ["pip", "install", "requests"]
+```
+
+**Always use exec form for CMD and ENTRYPOINT.** Shell form wraps your
+command in `/bin/sh -c "..."` — which means your app is NOT PID 1, the
+shell is. This breaks signal handling (SIGTERM won't reach your app on
+`docker stop`) causing unclean shutdowns.
+
+```
+Shell form:  PID 1 = /bin/sh → your app never gets SIGTERM
+Exec form:   PID 1 = your app → SIGTERM handled correctly
+```
+
+Shell form is fine for `RUN` since it only runs at build time.
+
+### `USER`
+```dockerfile
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+USER appuser          # all commands after this run as appuser, not root
+```
+Never run production containers as root. Covered in depth in Lesson 09 (Security).
+
+### `LABEL`
+```dockerfile
+LABEL maintainer="you@example.com"
+LABEL version="1.0"
+LABEL description="Python automation script"
+```
+Adds metadata to the image. Visible in `docker inspect`. No runtime effect.
 
 ---
 

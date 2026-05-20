@@ -135,10 +135,20 @@ works — the Linux VM must be up for the kernel features to be available.
 
 ```bash
 # Run with resource limits (cgroups)
-docker run --memory 512m --cpus 1 <image>
+docker run --memory 512m <image>          # max 512MB RAM
+docker run --memory 512m --memory-swap 512m <image>  # disable swap too
+docker run --cpus 1.5 <image>             # max 1.5 CPU cores
+docker run --cpus 0.5 --memory 256m <image>  # both limits together
+docker run --pids-limit 100 <image>       # max 100 processes (prevents fork bombs)
 
 # See processes inside container (slim images don't have ps)
 docker run <image> sh -c "ls /proc | grep -E '^[0-9]+$'"
+
+# See resource usage of running containers live
+docker stats                              # live CPU, RAM, network, disk I/O
+
+# See container's cgroup limits
+docker inspect <container> | grep -i memory
 ```
 
 ---

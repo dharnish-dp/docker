@@ -1,0 +1,21 @@
+services:
+
+  app:
+    build: .
+    networks:
+      - app-network
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - app-network
+    volumes:
+      - redisdata:/data
+
+networks:
+  app-network:
+
+volumes:
+  redisdata:

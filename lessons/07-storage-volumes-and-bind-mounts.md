@@ -147,17 +147,26 @@ Use for secrets, session tokens, credentials that must never touch disk.
 
 ---
 
-## Volume Syntax — Two Forms
+## Volume Syntax — All Forms
 
 ```bash
 # Named volume
 -v mydata:/data
 
+# Named volume — read-only (container cannot write to it)
+-v mydata:/data:ro
+
 # Bind mount (absolute path or ~)
 -v /Users/ddp/myapp:/app
 -v ~/myapp:/app
 -v $(pwd):/app          ← current directory (most common in dev)
+
+# Bind mount — read-only (container can read but not modify your Mac files)
+-v $(pwd):/app:ro
 ```
+
+**Read-only volumes** (`:ro`) are important for security — if a container
+is compromised, it cannot modify your source files or corrupt your data.
 
 `$(pwd)` is the most useful pattern — mount whatever directory you're
 currently in:

@@ -266,14 +266,20 @@ Container (isolated process, runs command, exits)
 ## Key Commands Learned
 
 ```bash
-docker pull <image>        # download image from registry
-docker images              # list images on your machine
-docker run <image> <cmd>   # create and start a container
-docker run -it <image> bash  # interactive shell inside container
-docker ps                  # list running containers
-docker ps -a               # list all containers (including stopped)
-docker rm <id>             # remove a stopped container
-docker rmi <image>         # remove an image
+docker pull <image>              # download image from registry
+docker images                    # list images on your machine
+docker image ls                  # same as docker images
+docker run <image> <cmd>         # create and start a container
+docker run -it <image> bash      # interactive shell inside container
+docker run --rm <image>          # auto-delete container when it exits
+docker run --name myapp <image>  # give container a fixed name
+docker ps                        # list running containers
+docker ps -a                     # list all containers (including stopped)
+docker rm <id>                   # remove a stopped container
+docker rm -f <id>                # force remove a running container
+docker rmi <image>               # remove an image
+docker tag <image> <new-name>    # add a new tag to an existing image
+docker inspect <id>              # full JSON details of container or image
 ```
 
 ---

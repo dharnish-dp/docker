@@ -16,7 +16,7 @@ Each lesson includes concepts, analogies, commands, and exercises.
 | [Lesson 05](lessons/05-layer-caching-and-optimization.md) | Layer Caching & Build Optimization | ✅ Done |
 | [Lesson 06](lessons/06-networking-deep-dive.md) | Networking Deep Dive | ✅ Done |
 | [Lesson 07](lessons/07-storage-volumes-and-bind-mounts.md) | Storage: Volumes & Bind Mounts | ✅ Done |
-| Lesson 08 | Docker Compose | ⏳ Upcoming |
+| [Lesson 08](lessons/08-docker-compose.md) | Docker Compose | ✅ Done |
 | Lesson 09 | Security | ⏳ Upcoming |
 | Lesson 10 | Production Patterns | ⏳ Upcoming |
 | Lesson 11 | BuildKit & Advanced Builds | ⏳ Upcoming |
