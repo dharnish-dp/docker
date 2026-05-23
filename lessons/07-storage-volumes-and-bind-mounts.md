@@ -4,6 +4,15 @@
 Persist data beyond container lifecycle and share files between your Mac
 and containers. Understand when to use each storage type.
 
+## Prerequisites
+Lesson 02 — Core Building Blocks (ephemeral containers)
+
+## After This Lesson You Will Be Able To
+- Persist database data across container restarts using named volumes
+- Mount your project folder into a container for live code reload (no rebuild)
+- Choose the right storage type for any situation
+- Use `$(pwd)` bind mount pattern for local development
+
 ---
 
 ## The Problem
@@ -178,18 +187,118 @@ docker run --rm -v $(pwd):/app python:3.11-slim sh -c "ls /app"
 
 ---
 
-## Key Commands
+## Command Reference — Every Command Explained
 
-```bash
-docker volume create <name>        # create a named volume
-docker volume ls                   # list all volumes
-docker volume inspect <name>       # details — mountpoint, driver
-docker volume rm <name>            # delete volume (permanent, irreversible)
-docker volume prune                # delete all unused volumes
+---
 
-docker run -v <volume>:<path>      # mount named volume
-docker run -v <host-path>:<path>   # bind mount
-docker run --tmpfs <path>          # tmpfs mount
+### `docker volume create mydata`
+
+```
+docker volume create  → create a named volume managed by Docker
+mydata                → name of the volume (you choose this)
+                        Returns the volume name on success
+                        Docker allocates storage in its Linux VM
+                        You never interact with the storage path directly
+```
+
+---
+
+### `docker volume ls`
+
+```
+docker volume ls  → list all named volumes on your machine
+Output columns:
+  DRIVER    → "local" = stored on this machine's disk
+  VOLUME NAME → the name you gave it (or auto-generated if unnamed)
+```
+
+---
+
+### `docker volume inspect mydata`
+
+```
+docker volume inspect  → show full JSON details of a volume
+mydata                 → volume name
+Key fields:
+  "Mountpoint" → actual path on disk inside Docker's Linux VM
+                 (e.g. /var/lib/docker/volumes/mydata/_data)
+                 You cannot access this path from macOS directly
+  "Driver"     → "local" = stored on this machine
+  "CreatedAt"  → when the volume was created
+  "Scope"      → "local" = this machine only
+```
+
+---
+
+### `docker volume rm mydata`
+
+```
+docker volume rm  → permanently delete a volume and ALL its data
+mydata            → volume name
+                    PERMANENT AND IRREVERSIBLE — no recycle bin
+                    FAILS if any container (running or stopped) is using it
+                    Remove containers first: docker rm <container>
+```
+
+---
+
+### `docker volume prune`
+
+```
+docker volume prune  → delete ALL volumes not currently used by any container
+                       Asks for confirmation (y/N)
+                       "Unused" = no running OR stopped container references it
+                       Use for cleanup after docker compose down -v
+```
+
+---
+
+### `docker run -v mydata:/data python:3.11-slim`
+
+```
+-v mydata:/data    → mount the named volume "mydata" at path /data inside container
+                    Left side  = volume name OR absolute Mac path
+                    Right side = path inside the container
+                    If volume doesn't exist → Docker creates it automatically
+                    Any writes to /data inside container → saved to the volume
+```
+
+---
+
+### `docker run -v $(pwd):/app python:3.11-slim`
+
+```
+-v $(pwd):/app     → bind mount: mount current Mac directory into container at /app
+$(pwd)             → shell expansion: replaced with the absolute path of current dir
+                    e.g. if you're in /Users/ddp/myproject → /Users/ddp/myproject:/app
+:/app              → where to mount it inside the container
+                    Files are NOT copied — they are the same files, shared live
+```
+
+---
+
+### `docker run --rm -v mydata:/data python:3.11-slim sh -c "echo 'hello' > /data/file.txt"`
+
+```
+--rm               → delete container when it exits
+-v mydata:/data    → mount the volume at /data
+sh -c "..."        → run a shell and execute the quoted command
+                    Needed because we chain multiple shell commands with > and &&
+echo 'hello'       → print "hello" to stdout
+> /data/file.txt   → redirect stdout to a file (creates or overwrites)
+                    This write goes to the volume, survives container deletion
+```
+
+---
+
+### `docker run --tmpfs /tmp myimage`
+
+```
+--tmpfs /tmp       → create a RAM filesystem at /tmp inside the container
+                    Writable: container can read and write here
+                    Temporary: contents exist only in RAM, lost when container stops
+                    Never on disk: nothing is ever written to the host's storage
+                    Multiple: --tmpfs /tmp --tmpfs /var/log --tmpfs /run
 ```
 
 ---

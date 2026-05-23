@@ -4,6 +4,15 @@
 Build your own Docker image from scratch using a Dockerfile.
 Understand what each instruction does and how it becomes a layer.
 
+## Prerequisites
+Lesson 03 — Under the Hood: Namespaces & cgroups
+
+## After This Lesson You Will Be Able To
+- Write a Dockerfile for any Python application
+- Explain every Dockerfile instruction and when to use it
+- Build and tag an image, inspect its layers with `docker history`
+- Understand the difference between ENTRYPOINT and CMD
+
 ---
 
 ## What is a Dockerfile?
@@ -169,7 +178,7 @@ CMD ["python", "app.py"]
 ```
 The default command when the container starts.
 Always use JSON array format `["python", "app.py"]` — not `CMD python app.py`.
-(Reason explained in Lesson 05 — shell form vs exec form.)
+See "Shell form vs Exec form" section above for the full explanation.
 
 ---
 

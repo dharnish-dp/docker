@@ -4,6 +4,15 @@
 Understand the three fundamental concepts of Docker and how they relate to
 each other. Every Docker command you ever run connects back to one of these.
 
+## Prerequisites
+Lesson 01 — The Problem Docker Solves
+
+## After This Lesson You Will Be Able To
+- Pull images from Docker Hub and list them locally
+- Run containers, get a shell inside them, and explore their filesystem
+- Explain the difference between an image and a container
+- Read `docker ps -a` output and understand every column
+
 ---
 
 ## The Three Building Blocks

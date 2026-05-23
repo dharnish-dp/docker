@@ -17,9 +17,9 @@ Each lesson includes concepts, analogies, commands, and exercises.
 | [Lesson 06](lessons/06-networking-deep-dive.md) | Networking Deep Dive | ✅ Done |
 | [Lesson 07](lessons/07-storage-volumes-and-bind-mounts.md) | Storage: Volumes & Bind Mounts | ✅ Done |
 | [Lesson 08](lessons/08-docker-compose.md) | Docker Compose | ✅ Done |
-| Lesson 09 | Security | ⏳ Upcoming |
-| Lesson 10 | Production Patterns | ⏳ Upcoming |
-| Lesson 11 | BuildKit & Advanced Builds | ⏳ Upcoming |
+| [Lesson 09](lessons/09-security.md) | Security | ✅ Done |
+| [Lesson 10](lessons/10-production-patterns.md) | Production Patterns | ✅ Done |
+| [Lesson 11](lessons/11-buildkit-and-advanced-builds.md) | BuildKit & Advanced Builds | ✅ Done |
 
 ---
 

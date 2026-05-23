@@ -4,6 +4,15 @@
 Understand how containers communicate with each other and with the outside
 world. Wire containers together correctly without hardcoding IP addresses.
 
+## Prerequisites
+Lesson 03 — Under the Hood (net namespace), Lesson 02 — Core Building Blocks
+
+## After This Lesson You Will Be Able To
+- Create custom bridge networks and connect containers to them
+- Explain why containers use service names instead of IP addresses
+- Map container ports to your Mac using `-p`
+- Debug container networking failures using `docker network inspect`
+
 ---
 
 ## The Problem
@@ -145,20 +154,115 @@ Mac/Browser → Container:
 
 ---
 
-## Key Commands
+## Command Reference — Every Command Explained
 
+---
+
+### `docker network ls`
+
+```
+docker network ls  → list all Docker networks on your machine
+Output columns:
+  NETWORK ID → short hash identifier
+  NAME       → network name (bridge, host, none are always present)
+  DRIVER     → bridge (local virtual switch), host (share Mac network), null (none)
+  SCOPE      → local (this machine only) vs swarm (multi-machine cluster)
+```
+
+---
+
+### `docker network create my-network`
+
+```
+docker network create  → create a new virtual network
+my-network             → name you assign (used in --network flag and Compose)
+                        Docker auto-assigns a /16 subnet (e.g. 172.18.0.0/16)
+                        Returns the full network ID on success
+```
+
+---
+
+### `docker network create --subnet 192.168.100.0/24 my-network`
+
+```
+--subnet 192.168.100.0/24  → define the IP range for this network manually
+                             Format: <network-address>/<prefix-length>
+                             /24 = 254 usable IPs (256 - network & broadcast)
+                             /16 = 65534 usable IPs (Docker default)
+                             Use custom subnet to:
+                             - Avoid conflicts with your home/office network
+                             - Assign predictable IPs to containers
+```
+
+---
+
+### `docker network inspect my-network`
+
+```
+docker network inspect  → show full JSON details of a network
+my-network              → network name or ID
+Key fields in output:
+  "Subnet"    → the IP range assigned (e.g. "172.18.0.0/16")
+  "Gateway"   → Docker's virtual router IP (always .1, e.g. 172.18.0.1)
+  "Containers" → all containers currently attached with their IPs
+```
+
+Use this for debugging — if a container is missing from "Containers", it's on the wrong network.
+
+---
+
+### `docker network rm my-network`
+
+```
+docker network rm  → permanently delete a network
+my-network         → network name or ID
+                    FAILS if any containers (running or stopped) are attached
+                    Must stop and remove containers first, then remove network
+```
+
+---
+
+### `docker run -d --name webserver --network my-network -p 8080:80 nginx`
+
+```
+docker run         → create and start a container
+-d                 → detached: run in background, print container ID, return terminal
+--name webserver   → assign a fixed name (also becomes DNS hostname on custom networks)
+                    Without --name: Docker generates a random name (e.g. "naughty_shaw")
+--network my-network → attach to this network (enables DNS by container name)
+-p 8080:80         → port mapping: Mac port 8080 → container port 80
+                    Left side = your Mac, Right side = inside container
+nginx              → use the official nginx image
+```
+
+---
+
+### `docker run --rm --network my-network python:3.11-slim python -c "..."`
+
+```
+--rm               → delete container automatically when it exits
+                    No manual docker rm needed
+                    Use for one-shot commands you don't need to keep
+--network my-network → same network as the service we want to reach
+python:3.11-slim   → use this image (already pulled)
+python -c "..."    → run a Python one-liner instead of the default CMD
+                    -c = "command string" — execute the following as Python code
+```
+
+---
+
+### `docker container prune`
+
+```
+docker container prune  → remove ALL stopped containers at once
+                         Asks for confirmation (y/N)
+                         Much faster than docker rm for cleanup
+                         Does NOT remove running containers
+```
+
+Equivalent to:
 ```bash
-docker network ls                              # list all networks
-docker network create my-network              # create custom bridge network
-docker network create --subnet x.x.x.x/y     # create with custom subnet
-docker network inspect my-network             # full details — IPs, containers
-docker network rm my-network                  # remove network (no containers attached)
-
-docker run --network my-network               # attach container to network
-docker run -p 8080:80                         # map host port → container port
-docker run -d                                 # run in background (detached)
-docker run --name webserver                   # give container a fixed name
-docker container prune                        # remove all stopped containers
+docker rm $(docker ps -aq -f status=exited)
 ```
 
 ---

@@ -5,6 +5,15 @@ Understand how Docker actually creates isolation. This is what separates
 top 1% Docker knowledge from average — when things break, you reason from
 first principles instead of guessing.
 
+## Prerequisites
+Lesson 02 — Core Building Blocks
+
+## After This Lesson You Will Be Able To
+- Explain what namespaces and cgroups are in plain English
+- Prove namespace isolation live using `/proc`
+- Set memory and CPU limits on any container
+- Explain why Docker Desktop must be running on Mac
+
 ---
 
 ## The Core Question

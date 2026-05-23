@@ -4,6 +4,15 @@
 Manage multi-container applications with a single YAML file instead of
 multiple long `docker run` commands.
 
+## Prerequisites
+Lessons 04, 06, 07 — Dockerfile, Networking, Storage (Compose combines all three)
+
+## After This Lesson You Will Be Able To
+- Write a `docker-compose.yml` for any multi-container application
+- Start and stop an entire application stack with one command
+- Use every Compose keyword (services, networks, volumes, depends_on, etc.)
+- Run services in background and read their logs
+
 ---
 
 ## The Problem

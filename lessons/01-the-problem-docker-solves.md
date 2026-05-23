@@ -3,6 +3,14 @@
 ## Goal
 Understand *why* Docker exists before touching a single command.
 
+## Prerequisites
+None — this is the starting point.
+
+## After This Lesson You Will Be Able To
+- Explain why Docker exists and what problem it solves
+- Describe the difference between a container and a VM
+- Define what a container is in one precise sentence
+
 ---
 
 ## The Pain Point

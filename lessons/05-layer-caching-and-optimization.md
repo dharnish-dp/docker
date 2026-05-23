@@ -4,6 +4,15 @@
 Write Dockerfiles that build in seconds, not minutes. Understand why
 instruction order is the single biggest lever for build performance.
 
+## Prerequisites
+Lesson 04 — Your First Dockerfile
+
+## After This Lesson You Will Be Able To
+- Order Dockerfile instructions to maximise cache hits
+- Explain why `COPY . .` before `RUN pip install` is a performance bug
+- Set up `.dockerignore` correctly for any Python project
+- Reduce build time from 90 seconds to under 2 seconds on code-only changes
+
 ---
 
 ## The Golden Rule
@@ -136,12 +145,74 @@ context slows every build before a single Dockerfile line runs.
 
 ---
 
-## Key Commands
+## Command Reference — Every Command Explained
 
-```bash
-docker build -t <name>:<tag> .          # build image
-docker build --no-cache .               # build ignoring all cached layers
-docker history <image>                  # see layers and sizes
+---
+
+### `docker build -t my-first-image:1.0 .`
+
+```
+docker build       → read the Dockerfile and build an image
+-t my-first-image:1.0  → tag: name=my-first-image, version=1.0
+                    The colon separates name from tag
+                    Without a tag, Docker uses "latest" automatically
+.                  → the build context = current directory
+                    Docker sends ALL files in this directory to the build engine
+                    .dockerignore controls what gets excluded
+```
+
+---
+
+### `docker build --no-cache .`
+
+```
+--no-cache         → skip ALL cached layers — re-execute every instruction
+                    Without this: Docker checks if each layer's inputs changed
+                    With this:    Docker ignores the cache entirely and runs fresh
+                    Use when:
+                      - Testing a full clean build
+                      - Picking up security patches in base images
+                      - Debugging a stale cache problem
+                    Note: does NOT clear BuildKit cache mounts (--mount=type=cache)
+```
+
+---
+
+### `docker history my-first-image:1.0`
+
+```
+docker history     → show all layers in an image
+my-first-image:1.0 → the image to inspect
+
+Output columns:
+  IMAGE      → layer ID (shows <missing> for inherited base image layers)
+  CREATED BY → the Dockerfile instruction that created this layer
+  SIZE       → how much disk space this layer adds
+```
+
+Reading the output:
+```
+Bottom row = oldest layer (base OS from FROM)
+Top row    = newest layer (your last instruction)
+0B size    = metadata-only instruction (CMD, ENV, EXPOSE, LABEL)
+Large size = RUN that installs packages or COPY of large files
+```
+
+Use `docker history` to:
+- Find which instruction is bloating your image
+- Verify CMD/ENV/LABEL cost 0 bytes (metadata only)
+- See what the base image contributes vs what you added
+
+---
+
+### `docker build -f Dockerfile.prod -t myapp:prod .`
+
+```
+-f Dockerfile.prod → use a specific Dockerfile instead of the default "Dockerfile"
+                    Useful when you have multiple Dockerfiles:
+                    Dockerfile        = development
+                    Dockerfile.prod   = production (multi-stage, distroless)
+                    Dockerfile.test   = testing
 ```
 
 ---
