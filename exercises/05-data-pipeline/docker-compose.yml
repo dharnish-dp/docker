@@ -1,0 +1,60 @@
+services:
+
+  # ── PostgreSQL ────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pipelineuser
+      POSTGRES_PASSWORD: pipelinepass
+      POSTGRES_DB: pipelinedb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - pipeline-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "pipelineuser", "-d", "pipelinedb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  # ── Scraper ───────────────────────────────────────────────────────
+  scraper:
+    build: .
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=pipelineuser
+      - POSTGRES_PASSWORD=pipelinepass
+      - POSTGRES_DB=pipelinedb
+      - POSTGRES_HOST=db
+    networks:
+      - pipeline-network
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+  # ── pgAdmin Dashboard ─────────────────────────────────────────────
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com   # login email
+      PGADMIN_DEFAULT_PASSWORD: admin          # login password
+    ports:
+      - "5050:80"                              # open http://localhost:5050
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin         # save pgAdmin settings
+    networks:
+      - pipeline-network
+    depends_on:
+      - db
+
+
+networks:
+  pipeline-network:
+
+volumes:
+  pgdata:
+  pgadmin_data:

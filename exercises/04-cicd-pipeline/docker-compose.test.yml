@@ -1,0 +1,48 @@
+services:
+
+  # Test database — separate from production data
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpassword
+      POSTGRES_DB: testdb
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "testuser", "-d", "testdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Test Redis
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 5
+
+  # Test runner — runs pytest against the test DB and Redis
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: >
+      python -m pytest tests/
+      -v
+      --tb=short
+      --html=reports/report.html
+      --self-contained-html
+    environment:
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpassword
+      - POSTGRES_DB=testdb
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./reports:/app/reports     # test reports saved back to Mac/CI
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy

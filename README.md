@@ -23,6 +23,24 @@ Each lesson includes concepts, analogies, commands, and exercises.
 
 ---
 
+## Real-World Projects
+
+| Project | Stack | What You Build |
+|---|---|---|
+| [01 — Selenium Test Suite](exercises/01-selenium-test-suite/) | Python + Selenium + Chrome | Containerized browser automation |
+| [02 — FastAPI + DB + Cache](exercises/02-fastapi-postgres-redis/) | FastAPI + PostgreSQL + Redis | Full production API stack |
+| [03 — Deploy to VPS](exercises/03-deploy-to-vps/) | Docker Hub + Nginx + VPS | Real server deployment |
+| [04 — CI/CD Pipeline](exercises/04-cicd-pipeline/) | GitHub Actions + Docker Hub | Automated build → test → deploy |
+| [05 — Data Pipeline](exercises/05-data-pipeline/) | Python + PostgreSQL + pgAdmin | Scheduled scraper with dashboard |
+
+---
+
+## What Comes After Docker
+
+- [What Next — Full Roadmap](what-next.md) — Kubernetes, Cloud, Terraform, Observability, GitOps
+
+---
+
 ## Quick Reference
 
 - [Cheat Sheet](reference/cheatsheet.md) — commands you'll use daily

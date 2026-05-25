@@ -1,0 +1,20 @@
+services:
+  tests:
+    build: .
+
+    # Bind mount: test results appear on your Mac in ./reports/
+    volumes:
+      - ./reports:/app/reports       # reports saved to Mac
+      - ./tests:/app/tests           # live reload: edit tests on Mac, run in container
+
+    # Shared memory: Chrome needs this to avoid crashes
+    # Default /dev/shm is 64MB — too small for Chrome rendering
+    shm_size: "2gb"
+
+    # Environment variables for test configuration
+    environment:
+      - PYTHONPATH=/deps
+      - PYTHONUNBUFFERED=1           # print output immediately (no buffering)
+
+    # No restart — this is a one-shot test runner
+    restart: "no"
